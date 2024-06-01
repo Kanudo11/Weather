@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="Assets/CSS/style.css">
+</head>
+<body>
+    <div class="card">
+        <div class="search">
+            <input type="text" id="city-input" placeholder="Enter city name" spellcheck="false">
+            <button id="search-button"><img src="Assets/Img/search.png"></button>
+        </div>
+
+        <div class="error" style="display: none;">
+            <p>Invalid city name or error fetching weather data.</p>
+        </div>
+        <div class="weather" style="display: none;">
+            <img src="" class="weather-icon">
+            <h1 class="temp">--°C</h1>
+            <h2 class="city">--</h2>
+            <div class="details">
+                <div class="col">
+                    <img src="Assets/Img/icons8-sea-48.png">
+                    <div>
+                        <div class="humidity">--%</div>
+                        <p>Humidity</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="Assets/Img/icons8-wind-100.png">
+                    <div>
+                        <div class="wind">--km/h</div>
+                        <p>Wind Speed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const searchInput = document.getElementById("city-input");
+        const searchButton = document.getElementById("search-button");
+        const weatherIcon = document.querySelector(".weather-icon");
+        const errorDiv = document.querySelector(".error");
+        const weatherDiv = document.querySelector(".weather");
+
+        async function checkWeather(city) {
+            try {
+                // Fetch weather data
+                const apiKey = "d5fd7efaa1bfd1cdeb9347d8eb6e043c"; // Replace with your OpenWeatherMap API key
+                const weatherResponse = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
+                if (!weatherResponse.ok) {
+                    throw new Error('Failed to fetch weather data');
+                }
+                const weatherData = await weatherResponse.json();
+
+                // Update UI with weather data
+                errorDiv.style.display = "none";
+                weatherDiv.style.display = "block";
+
+                document.querySelector(".city").innerHTML = weatherData.name;
+                document.querySelector(".temp").innerHTML = Math.round(weatherData.main.temp) + "°C";
+                document.querySelector(".humidity").innerHTML = weatherData.main.humidity + "%";
+                document.querySelector(".wind").innerHTML = Math.round(weatherData.wind.speed) + "km/h";
+
+                const weatherIconCode = weatherData.weather[0].icon;
+                setWeatherIcon(weatherIconCode);
+            } catch (error) {
+                console.error(error);
+                errorDiv.style.display = "block";
+                weatherDiv.style.display = "none";
+                if (error.message === 'Failed to fetch weather data') {
+                    errorDiv.innerHTML = "Failed to fetch data. Please try again later.";
+                } else {
+                    errorDiv.innerHTML = "City not found. Please enter a valid city name.";
+                }
+            }
+        }
+
+        function setWeatherIcon(weatherIconCode) {
+            weatherIcon.src = `http://openweathermap.org/img/wn/${weatherIconCode}@2x.png`;
+        }
+
+        searchButton.addEventListener("click", () => {
+            const city = searchInput.value.trim();
+            if (city) {
+                checkWeather(city);
+            } else {
+                errorDiv.style.display = "block";
+                weatherDiv.style.display = "none";
+                errorDiv.innerHTML = "Please enter a city name.";
+            }
+        });
+
+        // Optional: Listen for 'Enter' key press
+        searchInput.addEventListener("keyup", (event) => {
+            if (event.key === "Enter") {
+                searchButton.click();
+            }
+        });
+    </script>
+</body>
+</html>

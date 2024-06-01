@@ -48,7 +48,7 @@
         async function checkWeather(city) {
             try {
                 // Fetch weather data
-                const apiKey = "d5fd7efaa1bfd1cdeb9347d8eb6e043c"; // Replace with your OpenWeatherMap API key
+                const apiKey = "d5fd7efaa1bfd1cdeb9347d8eb6e043c"; 
                 const weatherResponse = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`);
                 if (!weatherResponse.ok) {
                     throw new Error('Failed to fetch weather data');
